@@ -1,0 +1,11 @@
+# Python-generated files/directories
+__pycache__/
+.egg-info/
+dist/
+
+# Virtual environments
+virtualenv/
+
+# IDEs
+.idea/
+.vs/
