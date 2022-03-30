@@ -5,7 +5,7 @@ Unit tests for :py:mod:`mlbids.playerids`.
 import bs4
 import requests
 
-from mlbids import playerids
+from mlbids import playeridmap
 
 
 class TestPlayerIDMap:
