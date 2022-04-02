@@ -9,52 +9,8 @@ import pandas as pd
 import pytest
 import requests
 
+from mlbids._sfbb import HEADERS
 from mlbids import playeridmap
-
-
-class TestSFBBData:
-    """
-    Unit tests for :py:class:`mlbids.playerids.SFBBTools`.
-    """
-    sfbb_data = playeridmap.SFBBTools()
-
-    def test_base_address(self):
-        """
-        Unit test for :py:meth:`mlbids.playerids.SFBBTools.base_address`.
-        """
-        res = requests.get(
-            self.sfbb_data.base_address,
-            headers=playeridmap.HEADERS
-        )
-        res.raise_for_status()
-        assert res.status_code == 200
-
-    def test_soup(self):
-        """
-        Unit test for :py:meth:`mlbids.playerids.SFBBTools._soup`.
-        """
-        soup = playeridmap.get_soup(self.sfbb_data.base_address)
-        assert soup
-
-    def test_element(self):
-        """
-        Unit test for :py:meth:`mlbids.playerids.SFBBTools._element`.
-        """
-        css = "div.entry-content > div > table tr:nth-child(2) > td:first-child"
-        assert len(self.sfbb_data._soup.select(css)) == 1
-
-    def test_urls(self):
-        """
-        Unit test for :py:meth:`mlbids.playerids.SFBBTools.urls`.
-        :return:
-        """
-        elems = self.sfbb_data._element.select("a")
-        assert len(elems) == 5
-        assert all(e.attrs.get("href") for e in elems)
-
-        for url in self.sfbb_data.urls:
-            res = requests.get(url, headers=playeridmap.HEADERS)
-            assert res.status_code == 200
 
 
 class TestPlayerIDMap:
@@ -121,7 +77,7 @@ class TestPlayerIDMap:
 
         :param url:
         """
-        res = requests.get(url, headers=playeridmap.HEADERS)
+        res = requests.get(url, headers=HEADERS)
         assert res.status_code == 200, url
 
     @pytest.mark.parametrize(
@@ -150,7 +106,7 @@ class TestPlayerIDMap:
         Unit test for :py:meth:`mlbids.playeridmap.PlayerIDMap.read_data`.
         """
         url = self.playerid_map._sfbb.urls.web_view
-        res = requests.get(url, headers=playeridmap.HEADERS)
+        res = requests.get(url, headers=HEADERS)
         assert len(pd.read_html(res.text)) == 1
 
         df = self.playerid_map.read_data()
@@ -179,7 +135,7 @@ class TestPlayerIDMap:
         Unit test for :py:meth:`mlbids.playeridmap.PlayerIDMap.read_changelog_data`.
         """
         url = self.playerid_map.changelog_web_view
-        res = requests.get(url, headers=playeridmap.HEADERS)
+        res = requests.get(url, headers=HEADERS)
         assert len(pd.read_html(res.text)) == 1
 
         df = self.playerid_map.read_changelog_data()
