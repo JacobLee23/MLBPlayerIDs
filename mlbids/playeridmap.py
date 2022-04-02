@@ -2,7 +2,6 @@
 
 """
 
-import builtins
 import datetime
 import json
 import math
@@ -38,8 +37,8 @@ class PlayerIDMap:
         .. py:attribute:: column_map
             Mapping of the original DataFrame column labels to the new column labels
         """
-        columns: builtins.tuple[str]
-        column_map: builtins.dict[str, str]
+        columns: typing.Tuple[str]
+        column_map: typing.Dict[str, str]
 
     @classmethod
     def __load_reformat(cls, columns_path: str, columnmap_path: str) -> _DFReformat:
