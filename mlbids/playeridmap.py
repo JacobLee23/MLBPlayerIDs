@@ -25,14 +25,17 @@ class PlayerIDMap:
     ]
 
     def __init__(self):
-        """
-
-        """
         self._sfbb = SFBBTools()
 
     class _DFReformat(typing.NamedTuple):
         """
+        Contains information for reformating the ``DataFrame`` column labels
 
+        .. py:attribute:: columns
+            Ordering of the new DataFrame column labels
+
+        .. py:attribute:: column_map
+            Mapping of the original DataFrame column labels to the new column labels
         """
         columns: tuple[str]
         column_map: dict[str, str]
@@ -40,10 +43,9 @@ class PlayerIDMap:
     @classmethod
     def __load_reformat(cls, columns_path: str, columnmap_path: str) -> _DFReformat:
         """
-
-        :param columns_path:
-        :param columnmap_path:
-        :return:
+        :param columns_path: Path to JSON file containing the new ``DataFrame`` column labels
+        :param columnmap_path: Path to JSON file containing the ``DataFrame`` column label mappings
+        :return: JSON data for reformatting the ``DataFrame`` column labels
         """
         with open(columns_path, "r", encoding="utf-8") as file:
             columns = json.load(file)
@@ -56,8 +58,7 @@ class PlayerIDMap:
     @classmethod
     def _playeridmap_reformat(cls) -> _DFReformat:
         """
-
-        :return:
+        :return: JSON data for reformatting the player ID map ``DataFrame`` column labels
         """
         reformat = cls.__load_reformat(
             os.path.join("mlbids", "data", "playeridmap_columns.json"),
@@ -68,8 +69,7 @@ class PlayerIDMap:
     @classmethod
     def _changelog_reformat(cls) -> _DFReformat:
         """
-
-        :return:
+        :return: JSON data for reformatting the player ID map CHANGELOG ``DataFrame`` column labels
         """
         reformat = cls.__load_reformat(
             os.path.join("mlbids", "data", "changelog_columns.json"),
@@ -80,61 +80,44 @@ class PlayerIDMap:
     @property
     def excel_download(self) -> str:
         """
-
-        :return:
+        :return: The URL for downloading the player ID map and CHANGELOG as an Excel workbook
         """
         return self._sfbb.urls.excel_download
 
     @property
     def web_view(self) -> str:
         """
-
-        :return:
+        :return: The URL for viewing the player ID map
         """
         return self._sfbb.urls.web_view
 
     @property
     def csv_download(self) -> str:
         """
-
-        :return:
+        :return: The URL for downloading the player ID map as a CSV file
         """
         return self._sfbb.urls.csv_download
 
     @property
     def changelog_web_view(self) -> str:
         """
-
-        :return:
+        :return: The URL for viewing the player ID map CHANGELOG
         """
         return self._sfbb.urls.changelog_web_view
 
     @property
     def changelog_csv_download(self) -> str:
         """
-
-        :return:
+        :return: The URL for downloading the player ID map CHANGELOG as a CSV file
         """
         return self._sfbb.urls.changelog_csv_download
 
-    def save_csv(self, path: str) -> str:
-        """
-
-        :param path:
-        :return:
-        """
-        res = requests.get(self.csv_download, headers=HEADERS)
-
-        with open(path, "wb") as file:
-            file.write(res.content)
-
-        return os.path.abspath(path)
-
     def save_excel(self, path: str) -> str:
         """
+        Writes hte player ID map to an Excel workbook.
 
-        :param path:
-        :return:
+        :param path: Location to which the Excel workbook should be downloaded
+        :return: The aboluste file path to the downlaoded Excel workbook
         """
         res = requests.get(self.excel_download, headers=HEADERS)
 
@@ -143,11 +126,26 @@ class PlayerIDMap:
 
         return os.path.abspath(path)
 
+    def save_csv(self, path: str) -> str:
+        """
+        Writes the player ID map to a CSV file.
+
+        :param path: Location to which the CSV file should be downloaded
+        :return: The absolute file path to the downloaded CSV file
+        """
+        res = requests.get(self.csv_download, headers=HEADERS)
+
+        with open(path, "wb") as file:
+            file.write(res.content)
+
+        return os.path.abspath(path)
+
     def save_changelog_csv(self, path: str) -> str:
         """
+        Writes the player ID map CHANGELOG to a CSV file.
 
-        :param path:
-        :return:
+        :param path: Location to which the CSV file should be downloaded
+        :return: The absolute file path to the downloaded CSV file
         """
         res = requests.get(self.changelog_csv_download, headers=HEADERS)
 
@@ -159,9 +157,12 @@ class PlayerIDMap:
     @staticmethod
     def __reformat_birthdate(birthdate: str) -> datetime.datetime:
         """
+        Converts the *birthdate* string representation to a ``datetime.datetime`` object.
+        Used for formatting the **Birthdate** column of the ``DataFrame`` returned by
+        :py:meth:`PlayerIDMap.read_data` and :py:meth:`PlayerIDMap.read_csv`.
 
-        :param birthdate:
-        :return:
+        :param birthdate: The string representation of the date
+        :return: The ``datetime.datetime`` representation of the date
         """
         try:
             return datetime.datetime.strptime(birthdate, "%m/%d/%Y")
@@ -171,10 +172,13 @@ class PlayerIDMap:
     @staticmethod
     def __reformat_active(active: str) -> bool:
         """
+        Converts the *active* string representation to a Boolean.
+        Used for formatting the **Active** column of the ``DataFrame`` returned by
+        :py:meth:`PlayerIDMap.read_data` and :py:meth:`PlayerIDMap.read_csv`.
 
-        :param active:
-        :return:
-        :raise ValueError:
+        :param active: The string representation of the active status
+        :return: The Boolean representatino of the active status
+        :raise ValueError: The active status was not recognized
         """
         active = active.upper()
         if active == "Y":
@@ -185,9 +189,8 @@ class PlayerIDMap:
 
     def _format_playeridmap_df(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-
-        :param df:
-        :return:
+        :param df: The raw ``DataFrame``
+        :return: The reformatted ``DataFrame``
         """
         reformat = self._playeridmap_reformat()
 
@@ -253,9 +256,8 @@ class PlayerIDMap:
 
     def _format_changelog_df(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-
-        :param df:
-        :return:
+        :param df: The raw ``DataFrame``
+        :return: The reformatted ``DataFrame``
         """
         reformat = self._changelog_reformat()
 
