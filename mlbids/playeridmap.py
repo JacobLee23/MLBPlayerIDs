@@ -21,9 +21,8 @@ HEADERS = {
 
 def get_soup(url: str) -> bs4.BeautifulSoup:
     """
-
-    :param url:
-    :return:
+    :param url: The URL of the webpage to scrape
+    :return: A `BeautifulSoup` object for the passed URL
     """
     res = requests.get(url, headers=HEADERS)
     res.raise_for_status()
@@ -31,17 +30,35 @@ def get_soup(url: str) -> bs4.BeautifulSoup:
     return soup
 
 
-class SFBBData:
+class SFBBTools:
     """
+    Web scraper for the `Tools`_ page of the `Smart Fantasy Baseball`_ website.
 
+    .. _Tools: https://www.smartfantasybaseball.com/tools/
+    .. _Smart Fantasy Baseball: https://www.smartfantasybaseball.com/
     """
     def __init__(self):
-        """
-
-        """
         self._base_address = "https://www.smartfantasybaseball.com/tools/"
 
     class URLs(typing.NamedTuple):
+        """
+        Contains URLs for view/downloading the player ID map data
+
+        .. py:attribute:: excel_download
+            Download player ID map and CHANGELOG as an Excel workbook
+
+        .. py:attribute:: web_view
+            View player ID map as a webpage
+
+        .. py:attribute:: csv_download
+            Download player ID map as a CSV file
+
+        .. py:attribute:: changelog_web_view
+            View player ID map CHANGELOG as a webpage
+
+        .. py:attribute:: changelog_csv_download
+            Download player ID map CHANGELOG as a CSV file
+        """
         excel_download: str
         web_view: str
         csv_download: str
@@ -52,24 +69,21 @@ class SFBBData:
     @property
     def base_address(self) -> str:
         """
-
-        :return:
+        :return: The URL for the `Tools` page of the `Smart Fantasy Baseball` website
         """
         return self._base_address
 
     @property
     def _soup(self) -> bs4.BeautifulSoup:
         """
-
-        :return:
+        :return: The parsed HTML document of :py:attr:`SFBB.base_address`
         """
         return get_soup(self.base_address)
 
     @property
     def _element(self) -> bs4.Tag:
         """
-
-        :return:
+        :return: The HTML tag corresponding to the element containing the redirect URLs
         """
         css = "div.entry-content > div > table tr:nth-child(2) > td:first-child"
         element = self._soup.select_one(css)
@@ -78,8 +92,7 @@ class SFBBData:
     @property
     def urls(self) -> URLs:
         """
-
-        :return:
+        :return: The redirect URLs for viewing/downloading the player ID map
         """
         data = collections.defaultdict()
         hrefs = [e.attrs.get("href") for e in self._element.select("a")]
@@ -108,7 +121,7 @@ class PlayerIDMap:
         """
 
         """
-        self._sfbb = SFBBData()
+        self._sfbb = SFBBTools()
 
     class _DFReformat(typing.NamedTuple):
         """
