@@ -27,7 +27,7 @@ setuptools.setup(
     ],
 
     packages=setuptools.find_packages(
-        exclude=["mlbides.tests"]
+        exclude=["mlbids.tests"]
     ),
     include_package_data=True,
     package_data={"": ["data/*.json"]},
