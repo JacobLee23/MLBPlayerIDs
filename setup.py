@@ -10,6 +10,7 @@ setuptools.setup(
     version="0.0.1",
     author="Jacob Lee",
     author_email="JLpython@outlook.com",
+
     description="A package for scraping IDs for MLB players",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -24,8 +25,12 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
+
     packages=setuptools.find_packages(
-        exclude=["mlbides.tests"]
+        exclude=["mlbids.tests"]
     ),
+    include_package_data=True,
+    package_data={"": ["data/*.json"]},
+
     python_requires=">=3.8",
 )
