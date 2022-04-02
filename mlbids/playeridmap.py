@@ -8,7 +8,6 @@ import math
 import typing
 
 import bs4
-import numpy as np
 import pandas as pd
 import requests
 
@@ -153,6 +152,46 @@ class PlayerIDMap:
         """
         self._sfbb = SFBBData()
 
+    @property
+    def excel_download(self) -> str:
+        """
+
+        :return:
+        """
+        return self._sfbb.urls.excel_download
+
+    @property
+    def web_view(self) -> str:
+        """
+
+        :return:
+        """
+        return self._sfbb.urls.web_view
+
+    @property
+    def csv_download(self) -> str:
+        """
+
+        :return:
+        """
+        return self._sfbb.urls.csv_download
+
+    @property
+    def changelog_web_view(self) -> str:
+        """
+
+        :return:
+        """
+        return self._sfbb.urls.changelog_web_view
+
+    @property
+    def changelog_csv_download(self) -> str:
+        """
+
+        :return:
+        """
+        return self._sfbb.urls.changelog_csv_download
+
     @staticmethod
     def __reformat_birthdate(birthdate: str) -> datetime.datetime:
         """
@@ -165,18 +204,29 @@ class PlayerIDMap:
         except ValueError:
             return datetime.datetime.strptime(birthdate, "%m/%d/%y")
 
+    @staticmethod
+    def __reformat_active(active: str) -> bool:
+        """
+
+        :param active:
+        :return:
+        :raise ValueError:
+        """
+        if active == "Y":
+            return True
+        elif active == "N":
+            return False
+        else:
+            raise ValueError
+
     def read_data(self) -> pd.DataFrame:
         """
 
         :return:
         """
-        url = self._sfbb.urls.web_view
-        res = requests.get(url, headers=HEADERS)
-        soup = get_soup(url)
-
-        title = soup.select_one("div#doc-title > span.name").text
-
+        res = requests.get(self.web_view, headers=HEADERS)
         df = pd.read_html(res.text)[0]
+
         df.rename(columns=df.iloc[0], inplace=True)
         df.drop(
             index=[df.index[0], df.index[1]], columns=[df.columns[0]],
@@ -186,6 +236,7 @@ class PlayerIDMap:
         df.rename(columns=self._columns_map, inplace=True)
         df = df.reindex(columns=self._columns)
 
+        df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
         df.loc[:, "Birthdate"] = df.loc[:, "Birthdate"].apply(
             lambda x: self.__reformat_birthdate(x)
         )
@@ -193,7 +244,7 @@ class PlayerIDMap:
             lambda x: x.split("/")
         )
         df.loc[:, "Active"] = df.loc[:, "Active"].apply(
-            lambda x: {"Y": True, "N": False}[x.upper()]
+            lambda x: self.__reformat_active(x.upper())
         )
         df.loc[:, self._integer_columns] = df.loc[:, self._integer_columns].applymap(
             lambda x: 0 if math.isnan(float(x)) else int(x)

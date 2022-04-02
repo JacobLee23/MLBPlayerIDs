@@ -5,6 +5,7 @@ Unit tests for :py:mod:`mlbids.playerids`.
 import datetime
 
 import pandas as pd
+import pytest
 import requests
 
 from mlbids import playeridmap
@@ -61,6 +62,29 @@ class TestPlayerIDMap:
     """
     playerid_map = playeridmap.PlayerIDMap()
 
+    @pytest.mark.parametrize(
+        "url", [
+            playerid_map.excel_download,
+            playerid_map.web_view,
+            playerid_map.csv_download,
+            playerid_map.changelog_web_view,
+            playerid_map.changelog_csv_download
+        ]
+    )
+    def test_sfbb_urls(self, url: str):
+        """
+        Unit tests for:
+        - :py:attr:`mlbids.playeridmap.PlayerIDMap.excel_download`.
+        - :py:attr:`mlbids.playeridmap.PlayerIDMap.web_view`.
+        - :py:attr:`mlbids.playeridmap.PlayerIDMap.csv_download`.
+        - :py:attr:`mlbids.playeridmap.PlayerIDMap.changelog_web_view`.
+        - :py:attr:`mlbids.playeridmap.PlayerIDMap.changelog_csv_download`.
+
+        :param url:
+        """
+        res = requests.get(url, headers=playeridmap.HEADERS)
+        assert res.status_code == 200, url
+
     def test_columns(self):
         """
         Unit test for :py:meth:`mlbids.playeridmap.PlayerIDMap._columns`.
@@ -82,10 +106,8 @@ class TestPlayerIDMap:
         """
         url = self.playerid_map._sfbb.urls.web_view
         res = requests.get(url, headers=playeridmap.HEADERS)
-        soup = playeridmap.get_soup(url)
-        assert soup
-
         assert len(pd.read_html(res.text)) == 1
+
         df = self.playerid_map.read_data()
         assert set(df.columns) == set(self.playerid_map._columns)
 
