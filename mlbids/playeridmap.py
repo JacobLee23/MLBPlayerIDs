@@ -212,12 +212,12 @@ class PlayerIDMap:
         :return:
         :raise ValueError:
         """
+        active = active.upper()
         if active == "Y":
             return True
-        elif active == "N":
+        if active == "N":
             return False
-        else:
-            raise ValueError
+        raise ValueError
 
     def read_data(self) -> pd.DataFrame:
         """
@@ -238,13 +238,13 @@ class PlayerIDMap:
 
         df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
         df.loc[:, "Birthdate"] = df.loc[:, "Birthdate"].apply(
-            lambda x: self.__reformat_birthdate(x)
+            self.__reformat_birthdate
         )
         df.loc[:, "AllPositions"] = df.loc[:, "AllPositions"].apply(
             lambda x: x.split("/")
         )
         df.loc[:, "Active"] = df.loc[:, "Active"].apply(
-            lambda x: self.__reformat_active(x.upper())
+            self.__reformat_active
         )
         df.loc[:, self._integer_columns] = df.loc[:, self._integer_columns].applymap(
             lambda x: 0 if math.isnan(float(x)) else int(x)
