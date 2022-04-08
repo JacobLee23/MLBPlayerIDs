@@ -1,10 +1,10 @@
 [
-  "PlayerID",
-  "PlayerName",
-  "Birthdate",
-  "FirstName",
   "LastName",
+  "FirstName",
+  "PlayerName",
   "LastFirstName",
+  "Birthdate",
+  "PlayerID",
   "Bats",
   "Throws",
   "Team",
@@ -38,8 +38,8 @@
   "OttoneuID",
   "RazzballName",
   "RetrosheetID",
+  "RtowireID",
   "RotowireName",
-  "RotowireID",
   "YahooID",
   "YahooName"
 ]
