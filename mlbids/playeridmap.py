@@ -8,6 +8,7 @@ import math
 import os
 import typing
 
+import numpy as np
 import pandas as pd
 import requests
 
@@ -163,11 +164,30 @@ class PlayerIDMap:
 
         :param birthdate: The string representation of the date
         :return: The ``datetime.datetime`` representation of the date
+        :raise TypeError:
         """
+        if not isinstance(birthdate, str):
+            if isinstance(birthdate, float) and math.isnan(birthdate):
+                return np.nan
+            raise TypeError
         try:
             return datetime.datetime.strptime(birthdate, "%m/%d/%Y")
         except ValueError:
             return datetime.datetime.strptime(birthdate, "%m/%d/%y")
+
+    @staticmethod
+    def __reformat_all_positions(all_positions: str) -> list[str]:
+        """
+
+        :param all_positions:
+        :return:
+        :raise TypeError:
+        """
+        if not isinstance(all_positions, str):
+            if isinstance(all_positions, float) and math.isnan(all_positions):
+                return np.nan
+            raise TypeError
+        return all_positions.split("/")
 
     @staticmethod
     def __reformat_active(active: str) -> bool:
@@ -178,8 +198,13 @@ class PlayerIDMap:
 
         :param active: The string representation of the active status
         :return: The Boolean representatino of the active status
+        :raise TypeError:
         :raise ValueError: The active status was not recognized
         """
+        if not isinstance(active, str):
+            if isinstance(active, float) and math.isnan(active):
+                return np.nan
+            raise TypeError
         active = active.upper()
         if active == "Y":
             return True
@@ -205,7 +230,7 @@ class PlayerIDMap:
             self.__reformat_birthdate
         )
         df.loc[:, "AllPositions"] = df.loc[:, "AllPositions"].apply(
-            lambda x: x.split("/")
+            self.__reformat_all_positions
         )
         df.loc[:, "Active"] = df.loc[:, "Active"].apply(
             self.__reformat_active
