@@ -29,7 +29,7 @@
   "THROWS": "Throws",
   "FANTPROSNAME": "FantasyProsName",
   "LASTCOMMAFIRST": "LastFirstName",
-  "ROTOWIREID": "RotowireID",
+  "ROTOWIREID": "RotoWireID",
   "FANDUELNAME": "FanDuelName",
   "FANDUELID": "FanDuelID",
   "DRAFTKINGSNAME": "DraftKingsName",
@@ -38,7 +38,7 @@
   "RAZZBALLNAME": "RazzballName",
   "FANTRAXID": "FantraxID",
   "FANTRAXNAME": "FantraxName",
-  "ROTOWIRENAME": "RotowireName",
+  "ROTOWIRENAME": "RotoWireName",
   "ALLPOS": "AllPositions",
   "NFBCLASTFIRST":"NFBCLastFirstName",
   "ACTIVE": "Active"
